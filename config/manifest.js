@@ -1,3 +1,5 @@
+const Joi = require('joi')
+
 const envKey = key => {
   const env = process.env.NODE_ENV || 'development'
 
@@ -42,16 +44,31 @@ const manifest = {
     },
     {
       plugin: './api',
-      options: { routes: { prefix: '/api' } }
+      options: {routes: {prefix: '/api'}}
+    },
+    {
+      plugin: {
+        register: 'hapi-pagination',
+        options: {
+          routes: { include: ['/api/orders']}
+        },
+        validate: {
+          query: {
+            limit: Joi.number().integer(),
+            page: Joi.number().integer(),
+            pagination: Joi.boolean()
+          }
+        }
+      }
     },
     {
       plugin: {
         register: 'good',
         options: {
-          ops: { interval: 60000 },
+          ops: {interval: 60000},
           reporters: {
             console: [
-              { module: 'good-squeeze', name: 'Squeeze', args: [{ error: '*' }] }, { module: 'good-console' }, 'stdout'
+              {module: 'good-squeeze', name: 'Squeeze', args: [{error: '*'}]}, {module: 'good-console'}, 'stdout'
             ]
           }
         }

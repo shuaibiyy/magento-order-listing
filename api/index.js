@@ -1,9 +1,9 @@
-const Home = require('./handlers/home')
+const Home = require('./handlers/handlers')
 
 exports.register = (plugin, options, next) => {
 
   plugin.route([
-    { method: 'GET', path: '/', config: Home.hello },
+    { method: 'GET', path: '/orders', config: Home.orders },
     { method: 'GET', path: '/restricted', config: Home.restricted },
     { method: 'GET', path: '/{path*}', config: Home.notFound }
   ])
