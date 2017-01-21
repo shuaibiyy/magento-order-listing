@@ -3,7 +3,7 @@ module Api exposing (..)
 import Http
 import RemoteData exposing (RemoteData(..))
 import Json.Decode as Decode exposing (Decoder, at, list, string, float, int, oneOf, succeed, fail, andThen)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode.Pipeline exposing (decode, required, custom)
 import Types exposing (..)
 
 
@@ -12,9 +12,11 @@ ordersEndpoint page =
     "http://localhost:8000/api/orders?page=" ++ (toString page)
 
 
-ordersDecoder : Decoder (List CustomerOrder)
+ordersDecoder : Decoder CustomerOrders
 ordersDecoder =
-    at [ "results" ] (list orderDecoder)
+    decode CustomerOrders
+        |> custom (at [ "results" ] (list orderDecoder))
+        |> custom (at [ "meta", "pageCount" ] int)
 
 
 customDecoder : Decoder b -> (b -> Result String a) -> Decoder a
@@ -50,7 +52,11 @@ orderDecoder =
             |> required "subtotal_incl_tax" string
             |> required "customer_firstname" string
             |> required "customer_lastname" string
+            |> required "shipping_description" string
+            |> required "store_name" string
             |> required "created_at" string
+            |> required "postcode" string
+            |> required "payone_transaction_status" string
 
 
 fetchOrders : PageNum -> Cmd Msg

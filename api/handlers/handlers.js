@@ -1,20 +1,6 @@
+const Joi = require('joi')
 const Boom = require('boom')
-const cache = require('memory-cache')
-const MagentoAPI = require('magento-xmlrpc')
-const helpers = require('../services/magento.js').magento
-const magento = new MagentoAPI({
-  host: 'www-test.unumotors.com',
-  port: 443,
-  path: '/en/api/xmlrpc/',
-  login: 'unu-challenge',
-  pass: 'unu-challenge'
-})
-
-magento.login((err) => {
-  if (err) {
-    console.log(err)
-  }
-})
+const magento = require('../services/magento.js').magento
 
 /**
  * Returns array contents delimited by page and requested limit.
@@ -35,9 +21,55 @@ const page = (arr, page, limit) => {
  */
 module.exports.orders = {
   handler: function ({query}, reply) {
-    helpers.fetchOrders(magento, cache)
-        .then((data) => reply.paginate(page(data, query.page, query.limit)),
-            (err) => Boom.wrap(err, 500))
+    magento.fetchOrders()
+        .then((data) => reply({
+          results: (page(data, query.page, query.limit)),
+          totalCount: data.length
+        }))
+        .catch(() => reply(Boom.serverUnavailable('Currently unable to fetch orders :(')))
+  }
+}
+
+/**
+ * TODO:
+ *  Find out why addresses returned from orders keep returning:
+     `{ [Magento Error: Address not exists.]
+      code: 102,
+      faultCode: 102,
+      faultString: 'Address not exists.',
+      original: { message: 'XML-RPC fault: Address not exists.', name: 'Error' },
+      name: 'Magento Error',
+      message: 'Address not exists.' }
+     `
+ * /api/addresses endpoint handler
+ * @type {{handler: exports.addresses.handler}}
+ */
+module.exports.addresses = {
+  validate: {
+    payload: {
+      addressIds: Joi.array().items(Joi.string())
+    }
+  },
+
+  handler: function ({payload}, reply) {
+    magento.fetchAddresses(payload['addressIds'])
+        .then((data) => reply(data))
+        .catch(() => reply(Boom.serverUnavailable('Currently unable to fetch addresses :(')))
+  }
+}
+
+/**
+ * /api/orders endpoint handler
+ * @type {{handler: exports.orders.handler}}
+ */
+module.exports.orders = {
+  handler: function ({query}, reply) {
+    magento.fetchOrders()
+        .then((data) => reply({
+          results: (page(data, query.page, query.limit)),
+          totalCount: data.length
+        }))
+        .catch(() => reply(Boom.serverUnavailable('Currently unable to fetch orders :(')))
   }
 }
 

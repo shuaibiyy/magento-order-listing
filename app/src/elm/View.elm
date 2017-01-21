@@ -2,9 +2,11 @@ module View exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (href, class, style)
+import Html.Events exposing (onClick)
 import Material.Table as Table
-import Material.Button as Button
+import Material.Tooltip as Tooltip
 import Material.Layout as Layout
+import Material.Icon as Icon
 import Material.Progress as Loading
 import Material.Options as Options exposing (css, nop)
 import RemoteData exposing (RemoteData(..))
@@ -47,7 +49,7 @@ view model =
 
 contentView : Model -> Html Msg
 contentView model =
-    case model.orders of
+    case model.customerOrders of
         NotAsked ->
             text "Orders not requested..."
 
@@ -60,15 +62,25 @@ contentView model =
         Failure err ->
             text ("Error: " ++ toString err)
 
-        Success orders ->
-            ordersView orders model
+        Success customerOrders ->
+            ordersView customerOrders model
 
 
-ordersView : List CustomerOrder -> Model -> Html Msg
-ordersView orders model =
+pageNavigation : Int -> Html Msg
+pageNavigation pageCount =
+    ul [ class "pagination" ] <|
+        List.map
+            (\num -> li [] [ a [ href "#", onClick (FlipPage num) ] [ text <| toString num ] ])
+        <|
+            List.range 1 pageCount
+
+
+ordersView : CustomerOrders -> Model -> Html Msg
+ordersView customerOrders model =
     div []
         [ h4 [] [ text "Customer Orders:" ]
-        , ordersTable orders model
+        , pageNavigation customerOrders.pageCount
+        , ordersTable customerOrders model
         ]
 
 
@@ -85,8 +97,8 @@ reverse x y =
             EQ
 
 
-ordersTable : List CustomerOrder -> Model -> Html Msg
-ordersTable orders model =
+ordersTable : CustomerOrders -> Model -> Html Msg
+ordersTable customerOrders model =
     let
         sort =
             case model.sortOrder of
@@ -112,10 +124,11 @@ ordersTable orders model =
                     , Table.th [] [ text "Customer Name" ]
                     , Table.th [] [ text "Order Date" ]
                     , Table.th [] [ text "Grand Total" ]
+                    , Table.th [] [ text "Details" ]
                     ]
                 ]
             , Table.tbody []
-                (sort orders
+                (sort customerOrders.orders
                     |> List.map
                         (\order ->
                             Table.tr []
@@ -123,7 +136,34 @@ ordersTable orders model =
                                 , Table.td [] [ text (order.customerFirstName ++ " " ++ order.customerLastName) ]
                                 , Table.td [ Table.numeric ] [ text order.orderDate ]
                                 , Table.td [ Table.numeric ] [ text order.grandTotal ]
+                                , Table.td []
+                                    [ Icon.view "apps"
+                                        [ Tooltip.attach Mdl [ 2 ] ]
+                                    , Tooltip.render Mdl
+                                        [ 2 ]
+                                        model.mdl
+                                        [ Tooltip.large
+                                        , Tooltip.top
+                                        , Tooltip.element Html.span
+                                        ]
+                                        [ text (orderDetails order) ]
+                                    ]
                                 ]
                         )
                 )
             ]
+
+
+orderDetails : CustomerOrder -> String
+orderDetails order =
+    "Store: "
+        ++ order.storeName
+        ++ "\n"
+        ++ "Transaction Status: "
+        ++ order.transactionStatus
+        ++ "\n"
+        ++ "Shipping Description: "
+        ++ order.shippingDescription
+        ++ "\n"
+        ++ "Customer Postcode: "
+        ++ order.postcode

@@ -4,6 +4,7 @@ import Material
 import Material.Table as Table
 import RemoteData exposing (RemoteData(..))
 import Types exposing (..)
+import Api exposing (fetchOrders)
 
 
 -- MODEL
@@ -11,15 +12,13 @@ import Types exposing (..)
 
 model : Model
 model =
-    { orders = Loading
+    { customerOrders = Loading
     , page = 1
     , mdl = Material.model
     , sortOrder = Just Table.Ascending
     }
 
 
-
--- ACTION, UPDATE
 
 
 rotate : Maybe Table.Order -> Maybe Table.Order
@@ -35,14 +34,19 @@ rotate order =
             Just Table.Ascending
 
 
+-- UPDATE
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OrdersResponse response ->
-            { model | orders = response } ! []
+            { model | customerOrders = response } ! []
 
         Mdl msg_ ->
             Material.update Mdl msg_ model
+
+        FlipPage page ->
+            model ! [ fetchOrders page ]
 
         SortByOrderId ->
             { model | sortOrder = rotate model.sortOrder } ! []

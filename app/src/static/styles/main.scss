@@ -18,3 +18,25 @@ body {
 h4 {
   color: #F44336;
 }
+
+ul.pagination {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+ul.pagination li {display: inline;}
+
+ul.pagination li a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+}
+
+ul.pagination li a.active {
+  background-color: #F44336;
+  color: white;
+}
+
+ul.pagination li a:hover:not(.active) {background-color: #ddd;}

@@ -14,7 +14,11 @@ type alias CustomerOrder =
     , grandTotal : String
     , customerFirstName : String
     , customerLastName : String
+    , shippingDescription : String
+    , storeName : String
     , orderDate : String
+    , postcode : String
+    , transactionStatus : String
     }
 
 
@@ -22,8 +26,14 @@ type alias PageNum =
     Int
 
 
+type alias CustomerOrders =
+    { orders : List CustomerOrder
+    , pageCount : Int
+    }
+
+
 type alias Model =
-    { orders : WebData (List CustomerOrder)
+    { customerOrders : WebData CustomerOrders
     , page : PageNum
     , mdl : Material.Model
     , sortOrder : Maybe Table.Order
@@ -31,7 +41,8 @@ type alias Model =
 
 
 type Msg
-    = OrdersResponse (WebData (List CustomerOrder))
+    = OrdersResponse (WebData CustomerOrders)
     | Mdl (Material.Msg Msg)
+    | FlipPage Int
     | SortByOrderId
     | SortByDate

@@ -1,10 +1,16 @@
 # Unu Fullstack Challenge Frontend
 
-Built using Elm.
+Built using Elm and the Elm Architecture.
 
 ### Install:
 
-Install all dependencies using the handy `reinstall` script:
+1. Make sure the API server is running.
+
+2. Install Elm:
+```
+npm install -g elm
+```
+3. Install all dependencies using the handy `reinstall` script:
 ```
 npm run reinstall
 ```
