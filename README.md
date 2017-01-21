@@ -21,3 +21,6 @@ Run tests:
 ```bash
 $ npm test
 ```
+
+## Frontend
+The Frontend can be found in the `app` directory. Take a look at its README.

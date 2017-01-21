@@ -25,19 +25,20 @@ const fetchOrders = magento => cache => () => {
       if (err) {
         console.error(err)
         reject(err)
+      } else {
+        magento.salesOrder.list((err, orders) => {
+          if (err) {
+            console.error(err)
+            reject(err)
+          } else {
+            // Cache orders for 5 minutes
+            cache.put('orders', orders, 300000)
+            fulfill(orders)
+          }
+        })
       }
     })
 
-    magento.salesOrder.list((err, orders) => {
-      if (err) {
-        console.error(err)
-        reject(err)
-      } else {
-        // Cache orders for 5 minutes
-        cache.put('orders', orders, 300000)
-        fulfill(orders)
-      }
-    })
   })
 }
 
@@ -72,14 +73,13 @@ const fetchAddresses = magento => (addressIds) => {
       if (err) {
         console.error(err)
         reject(err)
+      } else {
+        const addresses = addressIds.map((i) => fetchAddress(magento, i))
+        Promise.all(addresses).then(values => {
+          fulfill(values)
+        }).catch((err) => reject(err))
       }
     })
-
-    const addresses = addressIds.map((i) => fetchAddress(magento, i))
-    Promise.all(addresses).then(values => {
-      fulfill(values)
-    }).catch((err) => reject(err))
-
   })
 }
 
