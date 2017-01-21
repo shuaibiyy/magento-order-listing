@@ -2,7 +2,7 @@ module Api exposing (..)
 
 import Http
 import RemoteData exposing (RemoteData(..))
-import Json.Decode as Decode exposing (Decoder, at, list, string, float, int)
+import Json.Decode as Decode exposing (Decoder, at, list, string, float, int, oneOf, succeed, fail, andThen)
 import Json.Decode.Pipeline exposing (decode, required)
 import Types exposing (..)
 
@@ -14,17 +14,43 @@ ordersEndpoint page =
 
 ordersDecoder : Decoder (List CustomerOrder)
 ordersDecoder =
-    list orderDecoder
+    at [ "results" ] (list orderDecoder)
+
+
+customDecoder : Decoder b -> (b -> Result String a) -> Decoder a
+customDecoder decoder toResult =
+    andThen
+        (\a ->
+            case toResult a of
+                Ok b ->
+                    succeed b
+
+                Err err ->
+                    fail err
+        )
+        decoder
+
+
+number : Decoder Int
+number =
+    oneOf
+        [ int
+        , customDecoder string String.toInt
+        ]
 
 
 orderDecoder : Decoder CustomerOrder
 orderDecoder =
-    decode CustomerOrder
-        |> required "order_id" int
-        |> required "subtotal_incl_tax" float
-        |> required "customer_firstname" string
-        |> required "customer_lastname" string
-        |> required "created_at" string
+    let
+        number =
+            oneOf [ int, customDecoder string String.toInt ]
+    in
+        decode CustomerOrder
+            |> required "order_id" number
+            |> required "subtotal_incl_tax" string
+            |> required "customer_firstname" string
+            |> required "customer_lastname" string
+            |> required "created_at" string
 
 
 fetchOrders : PageNum -> Cmd Msg

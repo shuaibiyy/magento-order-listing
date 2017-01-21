@@ -23,6 +23,7 @@
     "memory-cache": "^0.1.6"
   },
   "devDependencies": {
+    "babel-eslint": "^7.1.1",
     "blipp": "^2.3.0",
     "code": "^4.0.0",
     "eslint": "^3.12.2",
