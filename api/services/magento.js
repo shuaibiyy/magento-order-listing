@@ -4,8 +4,8 @@ const magento = new MagentoAPI({
   host: 'www-test.unumotors.com',
   port: 443,
   path: '/en/api/xmlrpc/',
-  login: 'unu-challenge',
-  pass: 'unu-challenge'
+  login: '',
+  pass: ''
 })
 
 /**
