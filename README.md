@@ -1,4 +1,6 @@
-# Unu Fullstack Challenge
+# Magento Order Listing API
+
+Retrieves sales orders from Magento, and makes them available via a REST API to an Elm frontend.
 
 ## Core Stack
 
@@ -23,4 +25,4 @@ $ npm test
 ```
 
 ## Frontend
-The Frontend can be found in the `app` directory. Take a look at its README.
+The Elm frontend can be found in the `app` directory. Take a look at its README.
