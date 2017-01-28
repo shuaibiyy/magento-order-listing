@@ -1,8 +1,8 @@
 {
-  "name": "unu-challenge",
+  "name": "magento-order-listing",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Unu Fullstack Challenge",
+  "description": "Magento Order Listing API",
   "main": "server.js",
   "scripts": {
     "test": "./node_modules/lab/bin/lab -v",
