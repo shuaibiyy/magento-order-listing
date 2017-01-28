@@ -1,4 +1,4 @@
-# Unu Fullstack Challenge Frontend
+# Magento Order Listing Frontend
 
 Built using Elm and the Elm Architecture.
 
